@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openoms"
+version = "0.1.0"
+description = "Open-source reference order orchestration decisioning kernel"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "Apache-2.0"}
+authors = [{name = "Chandan Venkatesh"}]
+dependencies = [
+  "fastmcp>=2.0.0",
+  "pydantic>=2.7.0,<3",
+  "PyYAML>=6.0.1",
+  "sqlalchemy>=2.0.29",
+  "psycopg[binary]>=3.1.18",
+  "redis>=5.0.4",
+  "ortools>=9.9.3963",
+  "python-dotenv>=1.0.1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2.0",
+  "ruff>=0.4.0",
+  "mypy>=1.9.0",
+]
+
+[project.scripts]
+openoms-server = "openoms.server:main"
+openoms-demo = "openoms.demo:main"
+
+[tool.setuptools]
+packages = ["openoms", "openoms.tools", "openoms.kernel", "openoms.store", "openoms.models"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unreachable = true
