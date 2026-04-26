@@ -131,7 +131,7 @@
           <div class="section-title"><h2>Order input</h2><span>Enterprise OMS-style payload</span></div>
           <div class="form-grid">
             <div class="field"><label for="apiBase">API base URL</label><input id="apiBase" value="http://127.0.0.1:8011" /></div>
-            <div class="field"><label for="orderNo">OrderNo</label><input id="orderNo" value="O10000001" /></div>
+            <div class="field"><label for="orderNo">OrderNo</label><input id="orderNo" value="A10000001" /></div>
             <div class="field"><label for="buyerUserId">BuyerUserId</label><input id="buyerUserId" value="cust-001" /></div>
             <div class="field"><label for="shipToZipCode">ShipToZipCode</label><input id="shipToZipCode" value="60601" /></div>
             <div class="field"><label for="itemId">ItemID</label><select id="itemId"><option value="HAMMER-001">HAMMER-001</option><option value="PAINT-RED-1G">PAINT-RED-1G</option></select></div>
@@ -303,7 +303,7 @@
 
     function orderPayload() {
       return {
-        OrderNo: els.orderNo.value.trim() || 'O10000001',
+        OrderNo: els.orderNo.value.trim() || 'A10000001',
         BuyerUserId: els.buyerUserId.value.trim() || 'cust-001',
         ShipToZipCode: els.shipToZipCode.value.trim(),
         OrderLines: [{ ItemID: els.itemId.value, OrderedQty: Number(els.orderedQty.value || 1), UnitPrice: Number(els.unitPrice.value || 0) }],
@@ -407,7 +407,7 @@
 
     function resetForm() {
       els.apiBase.value = 'http://127.0.0.1:8011';
-      els.orderNo.value = 'O10000001';
+      els.orderNo.value = 'A10000001';
       els.buyerUserId.value = 'cust-001';
       els.shipToZipCode.value = '60601';
       els.itemId.value = 'HAMMER-001';

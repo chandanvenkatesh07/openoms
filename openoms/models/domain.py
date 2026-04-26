@@ -47,7 +47,7 @@ class OrderLine(AliasModel):
 
 class Order(AliasModel):
     order_header_key: str = Field(default_factory=lambda: str(uuid4()), alias="OrderHeaderKey")
-    order_no: str = Field(default_factory=lambda: f"O{str(uuid4().int)[:8]}", alias="OrderNo")
+    order_no: str = Field(default_factory=lambda: f"A{str(uuid4().int)[:8]}", alias="OrderNo")
     enterprise_code: str = Field(default="DEFAULT", alias="EnterpriseCode")
     seller_organization_code: str = Field(default="DEFAULT", alias="SellerOrganizationCode")
     document_type: str = Field(default="0001", alias="DocumentType")

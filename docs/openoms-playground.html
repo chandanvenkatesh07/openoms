@@ -511,7 +511,7 @@
           <div class="form-grid">
             <div class="field">
               <label for="orderNo">OrderNo</label>
-              <input id="orderNo" value="O10000001" />
+              <input id="orderNo" value="A10000001" />
             </div>
             <div class="field">
               <label for="buyerUserId">BuyerUserId</label>
@@ -926,7 +926,7 @@
 
     function runDemo() {
       const order = {
-        OrderNo: els.orderNo.value.trim() || 'O10000001',
+        OrderNo: els.orderNo.value.trim() || 'A10000001',
         BuyerUserId: els.buyerUserId.value.trim() || 'cust-001',
         ShipToZipCode: els.shipToZipCode.value.trim(),
         OrderLines: [{
@@ -985,7 +985,7 @@
     }
 
     function resetDemo() {
-      els.orderNo.value = 'O10000001';
+      els.orderNo.value = 'A10000001';
       els.buyerUserId.value = 'cust-001';
       els.shipToZipCode.value = '60601';
       els.itemId.value = 'HAMMER-001';

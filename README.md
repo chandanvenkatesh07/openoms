@@ -35,7 +35,7 @@ The inbound order payload uses enterprise OMS-style field names so examples look
 
 ```json
 {
-  "OrderNo": "O10000001",
+  "OrderNo": "A10000001",
   "EnterpriseCode": "DEFAULT",
   "SellerOrganizationCode": "DEFAULT",
   "DocumentType": "0001",
