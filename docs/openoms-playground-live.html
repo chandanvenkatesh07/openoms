@@ -250,16 +250,24 @@
       const destination = zipCoords[destinationZip];
       const destinationPoint = destination ? pointFor(destination[0], destination[1]) : null;
       const selectedNode = state.nodes.find(node => node.node_id === selectedNodeId);
-      const line = selectedNode && destinationPoint ? (() => {
+      const selectedPoint = selectedNode ? pointFor(selectedNode.lat, selectedNode.lon) : null;
+      const overlapping = selectedPoint && destinationPoint
+        ? Math.abs(selectedPoint.x - destinationPoint.x) < 0.01 && Math.abs(selectedPoint.y - destinationPoint.y) < 0.01
+        : false;
+      const renderedDestinationPoint = overlapping
+        ? { x: destinationPoint.x + 4, y: destinationPoint.y - 4 }
+        : destinationPoint;
+      const line = selectedNode && renderedDestinationPoint ? (() => {
         const from = pointFor(selectedNode.lat, selectedNode.lon);
-        return `<line x1="${from.x}%" y1="${from.y}%" x2="${destinationPoint.x}%" y2="${destinationPoint.y}%" stroke="rgba(34,197,94,0.8)" stroke-width="2.5" stroke-dasharray="8 7" />`;
+        return `<line x1="${from.x}%" y1="${from.y}%" x2="${renderedDestinationPoint.x}%" y2="${renderedDestinationPoint.y}%" stroke="rgba(34,197,94,0.8)" stroke-width="2.5" stroke-dasharray="8 7" />`;
       })() : '';
       const nodeMarkup = state.nodes.map(node => {
         const point = pointFor(node.lat, node.lon);
         const selected = node.node_id === selectedNodeId;
-        return `<g><circle cx="${point.x}%" cy="${point.y}%" r="${selected ? 8 : 6}" fill="${selected ? '#22c55e' : '#60a5fa'}" stroke="rgba(255,255,255,0.75)" stroke-width="1.4"></circle><text x="${point.x}%" y="calc(${point.y}% - 14px)" text-anchor="middle" fill="#e2e8f0" font-size="11" font-weight="700">${node.node_id}</text></g>`;
+        const glow = selected ? `<circle cx="${point.x}%" cy="${point.y}%" r="11" fill="rgba(34,197,94,0.18)"></circle>` : '';
+        return `<g>${glow}<circle cx="${point.x}%" cy="${point.y}%" r="${selected ? 8 : 6}" fill="${selected ? '#22c55e' : '#60a5fa'}" stroke="rgba(255,255,255,0.75)" stroke-width="1.4"></circle><text x="${point.x}%" y="calc(${point.y}% - 14px)" text-anchor="middle" fill="#e2e8f0" font-size="11" font-weight="700">${node.node_id}</text></g>`;
       }).join('');
-      const destinationMarkup = destinationPoint ? `<g><circle cx="${destinationPoint.x}%" cy="${destinationPoint.y}%" r="8" fill="#f59e0b" stroke="rgba(255,255,255,0.75)" stroke-width="1.4"></circle><text x="${destinationPoint.x}%" y="calc(${destinationPoint.y}% - 16px)" text-anchor="middle" fill="#fde68a" font-size="11" font-weight="700">ZIP ${destinationZip}</text></g>` : `<text x="50%" y="50%" text-anchor="middle" fill="rgba(226,232,240,0.5)" font-size="14">Unknown ZIP ${destinationZip}</text>`;
+      const destinationMarkup = renderedDestinationPoint ? `<g>${overlapping ? `<line x1="${selectedPoint.x}%" y1="${selectedPoint.y}%" x2="${renderedDestinationPoint.x}%" y2="${renderedDestinationPoint.y}%" stroke="rgba(245,158,11,0.45)" stroke-width="1.5" stroke-dasharray="4 4" />` : ''}<circle cx="${renderedDestinationPoint.x}%" cy="${renderedDestinationPoint.y}%" r="8" fill="#f59e0b" stroke="rgba(255,255,255,0.75)" stroke-width="1.4"></circle><text x="${renderedDestinationPoint.x}%" y="calc(${renderedDestinationPoint.y}% - 16px)" text-anchor="middle" fill="#fde68a" font-size="11" font-weight="700">ZIP ${destinationZip}</text></g>` : `<text x="50%" y="50%" text-anchor="middle" fill="rgba(226,232,240,0.5)" font-size="14">Unknown ZIP ${destinationZip}</text>`;
       els.map.innerHTML = `<svg viewBox="0 0 100 100" preserveAspectRatio="none"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(148,163,184,0.08)" stroke-width="0.4"/></pattern></defs><rect width="100" height="100" fill="url(#grid)"></rect><path d="M8,52 C12,38 23,25 34,24 C42,17 56,18 63,26 C71,26 81,33 90,39 C94,45 92,53 85,57 C77,59 74,68 67,72 C57,73 48,78 40,75 C33,76 28,73 22,67 C14,66 8,61 8,52 Z" fill="rgba(15,23,42,0.35)" stroke="rgba(148,163,184,0.18)" stroke-width="0.6"/>${line}${nodeMarkup}${destinationMarkup}</svg>`;
     }
 
