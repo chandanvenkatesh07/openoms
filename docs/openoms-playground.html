@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OpenOMS Visual Playground</title>
+  <style>
+    :root {
+      --bg: #081120;
+      --panel: rgba(15, 23, 42, 0.88);
+      --panel-2: rgba(30, 41, 59, 0.78);
+      --line: rgba(148, 163, 184, 0.22);
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #60a5fa;
+      --accent-2: #22c55e;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --shadow: 0 24px 60px rgba(2, 6, 23, 0.45);
+      --radius: 20px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(96,165,250,0.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(34,197,94,0.12), transparent 20%),
+        linear-gradient(180deg, #020617 0%, #081120 48%, #0f172a 100%);
+      min-height: 100vh;
+    }
+
+    .shell {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 20px;
+      margin-bottom: 22px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .hero-copy {
+      padding: 28px;
+    }
+
+    h1, h2, h3, p { margin: 0; }
+    h1 {
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      line-height: 1.02;
+      margin-bottom: 14px;
+      letter-spacing: -0.04em;
+    }
+
+    .lead {
+      color: var(--muted);
+      font-size: 1.02rem;
+      line-height: 1.65;
+      max-width: 62ch;
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .stat {
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid rgba(96, 165, 250, 0.15);
+      padding: 14px 16px;
+      border-radius: 16px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 7px;
+    }
+
+    .stat-value {
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .hero-card {
+      padding: 24px;
+      display: grid;
+      gap: 14px;
+      align-content: center;
+      background:
+        linear-gradient(135deg, rgba(96,165,250,0.15), rgba(34,197,94,0.08)),
+        var(--panel);
+    }
+
+    .badge-row, .chips {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .badge, .chip {
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(15, 23, 42, 0.65);
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+
+    .chip.good { border-color: rgba(34,197,94,0.35); color: #bbf7d0; }
+    .chip.info { border-color: rgba(96,165,250,0.35); color: #bfdbfe; }
+    .chip.warn { border-color: rgba(245,158,11,0.35); color: #fde68a; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 20px;
+    }
+
+    .sidebar, .workspace {
+      display: grid;
+      gap: 20px;
+      align-content: start;
+    }
+
+    .card {
+      padding: 22px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .section-title h2 {
+      font-size: 1.1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .section-title span {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .field label {
+      font-size: 0.86rem;
+      color: var(--muted);
+    }
+
+    .field input, .field select {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid rgba(148,163,184,0.18);
+      background: rgba(15, 23, 42, 0.8);
+      color: var(--text);
+      padding: 13px 14px;
+      outline: none;
+      font-size: 0.97rem;
+    }
+
+    .field input:focus, .field select:focus {
+      border-color: rgba(96,165,250,0.7);
+      box-shadow: 0 0 0 3px rgba(96,165,250,0.15);
+    }
+
+    .button-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button.primary {
+      background: linear-gradient(135deg, #60a5fa, #2563eb);
+      color: white;
+    }
+    button.secondary {
+      background: rgba(30,41,59,0.9);
+      color: var(--text);
+      border: 1px solid rgba(148,163,184,0.15);
+    }
+
+    .quick-links {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .preset {
+      text-align: left;
+      background: rgba(15, 23, 42, 0.56);
+      color: var(--text);
+      border: 1px solid rgba(148,163,184,0.15);
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .preset small {
+      display: block;
+      color: var(--muted);
+      margin-top: 5px;
+    }
+
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 20px;
+    }
+
+    .map {
+      position: relative;
+      height: 360px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 18% 32%, rgba(96,165,250,0.16), transparent 18%),
+        radial-gradient(circle at 76% 54%, rgba(34,197,94,0.14), transparent 20%),
+        linear-gradient(180deg, rgba(15,23,42,0.88), rgba(2,6,23,0.98));
+      border-radius: 18px;
+      border: 1px solid rgba(148,163,184,0.14);
+    }
+
+    .map::before {
+      content: "United States routing view";
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      color: rgba(226,232,240,0.52);
+      font-size: 0.82rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .map svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .legend {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      display: inline-block;
+      margin-right: 7px;
+    }
+
+    .status-banner {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(96,165,250,0.08);
+      border: 1px solid rgba(96,165,250,0.18);
+      color: #dbeafe;
+      line-height: 1.55;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .metric {
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .metric .label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+
+    .metric .value {
+      font-size: 1.2rem;
+      font-weight: 800;
+    }
+
+    .list, .timeline {
+      display: grid;
+      gap: 12px;
+    }
+
+    .candidate {
+      display: grid;
+      gap: 10px;
+      padding: 15px;
+      border-radius: 18px;
+      background: rgba(15,23,42,0.55);
+      border: 1px solid rgba(148,163,184,0.12);
+    }
+
+    .candidate.selected {
+      border-color: rgba(34,197,94,0.35);
+      box-shadow: inset 0 0 0 1px rgba(34,197,94,0.15);
+      background: linear-gradient(135deg, rgba(34,197,94,0.1), rgba(15,23,42,0.55));
+    }
+
+    .candidate-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .candidate-name { font-weight: 800; }
+    .candidate-meta { color: var(--muted); font-size: 0.9rem; }
+
+    .candidate-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      font-size: 0.92rem;
+    }
+
+    .candidate-stats div {
+      padding: 10px;
+      border-radius: 12px;
+      background: rgba(2,6,23,0.36);
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid rgba(148,163,184,0.12);
+      border-radius: 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 640px;
+    }
+
+    th, td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid rgba(148,163,184,0.08);
+      font-size: 0.95rem;
+    }
+
+    th {
+      color: var(--muted);
+      text-transform: uppercase;
+      font-size: 0.76rem;
+      letter-spacing: 0.08em;
+      background: rgba(2,6,23,0.4);
+      position: sticky;
+      top: 0;
+    }
+
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .timeline-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: rgba(96,165,250,0.18);
+      color: #bfdbfe;
+      border: 1px solid rgba(96,165,250,0.25);
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+
+    .timeline-copy {
+      padding: 0 0 14px;
+      border-bottom: 1px dashed rgba(148,163,184,0.14);
+    }
+
+    .timeline-copy strong { display: block; margin-bottom: 5px; }
+    .timeline-copy span { color: var(--muted); line-height: 1.5; }
+
+    .explanation {
+      padding: 18px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(34,197,94,0.11), rgba(15,23,42,0.72));
+      border: 1px solid rgba(34,197,94,0.22);
+      line-height: 1.7;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 1180px) {
+      .hero, .layout, .workspace-grid { grid-template-columns: 1fr; }
+      .metric-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 680px) {
+      .shell { padding: 16px; }
+      .hero-stats, .quick-links, .metric-grid { grid-template-columns: 1fr; }
+      .candidate-stats { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="hero">
+      <div class="panel hero-copy">
+        <div class="badge-row">
+          <div class="badge">OpenOMS v0.1 playground</div>
+          <div class="badge">Deterministic sourcing</div>
+          <div class="badge">Sterling-style order input</div>
+        </div>
+        <h1>Watch the sourcing decision happen.</h1>
+        <p class="lead">
+          This visual playground mirrors the current OpenOMS demo logic in the browser: candidate lookup, nearest-feasible scoring,
+          deterministic promise dates, and the final node selection. It is intentionally narrow and auditable.
+        </p>
+        <div class="hero-stats">
+          <div class="stat">
+            <div class="stat-label">Policy version</div>
+            <div class="stat-value" id="policyVersionHero">2026-04-25</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Scoring model</div>
+            <div class="stat-value">Nearest-feasible heuristic</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Seed footprint</div>
+            <div class="stat-value">5 active nodes</div>
+          </div>
+        </div>
+      </div>
+      <div class="panel hero-card">
+        <h2>What this demo proves</h2>
+        <div class="chips">
+          <span class="chip good">Same inputs → same decision</span>
+          <span class="chip info">Reason trace is inspectable</span>
+          <span class="chip warn">LLM stays outside the commit path</span>
+        </div>
+        <p class="lead" style="font-size:0.95rem; max-width:none;">
+          The page is self-contained so you can open it directly in a browser and test different ZIP codes or SKUs without standing up backend services.
+        </p>
+      </div>
+    </section>
+
+    <section class="layout">
+      <aside class="sidebar">
+        <div class="panel card">
+          <div class="section-title">
+            <h2>Order input</h2>
+            <span>Sterling-style fields</span>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="orderNo">OrderNo</label>
+              <input id="orderNo" value="Y10000001" />
+            </div>
+            <div class="field">
+              <label for="buyerUserId">BuyerUserId</label>
+              <input id="buyerUserId" value="cust-001" />
+            </div>
+            <div class="field">
+              <label for="shipToZipCode">ShipToZipCode</label>
+              <input id="shipToZipCode" value="60601" />
+            </div>
+            <div class="field">
+              <label for="itemId">ItemID</label>
+              <select id="itemId">
+                <option value="HAMMER-001">HAMMER-001</option>
+                <option value="PAINT-RED-1G">PAINT-RED-1G</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="orderedQty">OrderedQty</label>
+              <input id="orderedQty" type="number" min="1" value="1" />
+            </div>
+            <div class="field">
+              <label for="unitPrice">UnitPrice</label>
+              <input id="unitPrice" type="number" step="0.01" min="0" value="19.99" />
+            </div>
+            <div class="button-row">
+              <button class="primary" id="runButton">Run sourcing demo</button>
+              <button class="secondary" id="resetButton">Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel card">
+          <div class="section-title">
+            <h2>Quick scenarios</h2>
+            <span>Useful sanity checks</span>
+          </div>
+          <div class="quick-links">
+            <button class="preset" data-zip="60601" data-sku="HAMMER-001" data-qty="1" data-price="19.99">
+              Chicago hammer
+              <small>Should pick store-chi</small>
+            </button>
+            <button class="preset" data-zip="75201" data-sku="HAMMER-001" data-qty="1" data-price="19.99">
+              Dallas hammer
+              <small>Should pick store-dal</small>
+            </button>
+            <button class="preset" data-zip="98101" data-sku="HAMMER-001" data-qty="1" data-price="19.99">
+              Seattle hammer
+              <small>Should prefer west coast coverage</small>
+            </button>
+            <button class="preset" data-zip="33131" data-sku="PAINT-RED-1G" data-qty="1" data-price="32.50">
+              Miami paint
+              <small>Compare dc-south vs dc-west</small>
+            </button>
+          </div>
+          <p class="footer-note">
+            Policy radius is <strong id="policyRadiusSidebar">150</strong> miles. If no candidate falls inside it, the demo shows a deterministic failure instead of inventing an answer.
+          </p>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <div class="workspace-grid">
+          <div class="panel card">
+            <div class="section-title">
+              <h2>Routing map</h2>
+              <span>Seed nodes + destination</span>
+            </div>
+            <div class="map" id="map"></div>
+            <div class="legend">
+              <span><i class="legend-dot" style="background:#60a5fa"></i>Fulfillment node</span>
+              <span><i class="legend-dot" style="background:#22c55e"></i>Selected node</span>
+              <span><i class="legend-dot" style="background:#f59e0b"></i>Destination</span>
+            </div>
+            <div class="status-banner" id="statusBanner"></div>
+          </div>
+
+          <div class="panel card">
+            <div class="section-title">
+              <h2>Decision summary</h2>
+              <span>Current run</span>
+            </div>
+            <div class="metric-grid">
+              <div class="metric">
+                <div class="label">Selected node</div>
+                <div class="value" id="selectedNodeMetric">—</div>
+              </div>
+              <div class="metric">
+                <div class="label">Distance</div>
+                <div class="value" id="distanceMetric">—</div>
+              </div>
+              <div class="metric">
+                <div class="label">Score</div>
+                <div class="value" id="scoreMetric">—</div>
+              </div>
+              <div class="metric">
+                <div class="label">Promise p50</div>
+                <div class="value" id="promiseMetric">—</div>
+              </div>
+            </div>
+            <div class="explanation" id="explanationBox" style="margin-top:16px;"></div>
+          </div>
+        </div>
+
+        <div class="workspace-grid">
+          <div class="panel card">
+            <div class="section-title">
+              <h2>Candidate nodes</h2>
+              <span>Filtered by SKU + radius</span>
+            </div>
+            <div class="list" id="candidateList"></div>
+          </div>
+
+          <div class="panel card">
+            <div class="section-title">
+              <h2>Decision timeline</h2>
+              <span>Trace-backed steps</span>
+            </div>
+            <div class="timeline" id="timeline"></div>
+          </div>
+        </div>
+
+        <div class="panel card">
+          <div class="section-title">
+            <h2>Scoring table</h2>
+            <span>shipping_cost=1.0 · capacity_pressure=1.5</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Node</th>
+                  <th>Type</th>
+                  <th>ZIP</th>
+                  <th>Available</th>
+                  <th>Distance</th>
+                  <th>Feasible</th>
+                  <th>Score</th>
+                </tr>
+              </thead>
+              <tbody id="scoreTableBody"></tbody>
+            </table>
+          </div>
+          <p class="footer-note">
+            Formula: <code>(distance_miles × shipping_cost) + ((10 / available) × capacity_pressure)</code>.<br />
+            That mirrors the current Python scorer and keeps the decision auditable.
+          </p>
+        </div>
+      </main>
+    </section>
+  </div>
+
+  <script>
+    const policy = {
+      version: "2026-04-25",
+      radius_miles: 150,
+      weights: {
+        shipping_cost: 1.0,
+        capacity_pressure: 1.5,
+      },
+    };
+
+    const zipCoords = {
+      "10001": [40.7506, -73.9972],
+      "02108": [42.3570, -71.0637],
+      "19103": [39.9526, -75.1742],
+      "20001": [38.9101, -77.0147],
+      "21201": [39.2946, -76.6255],
+      "28202": [35.2271, -80.8431],
+      "33131": [25.7680, -80.1890],
+      "30301": [33.7525, -84.3915],
+      "37203": [36.1520, -86.7830],
+      "48226": [42.3314, -83.0458],
+      "55401": [44.9833, -93.2667],
+      "60601": [41.8864, -87.6186],
+      "63101": [38.6312, -90.1922],
+      "64106": [39.0997, -94.5786],
+      "75201": [32.7876, -96.7994],
+      "77002": [29.7569, -95.3625],
+      "80202": [39.7528, -104.9992],
+      "85004": [33.4518, -112.0682],
+      "90001": [33.9739, -118.2487],
+      "94103": [37.7725, -122.4091],
+      "94105": [37.7898, -122.3942],
+      "97205": [45.5200, -122.6819],
+      "98101": [47.6101, -122.3344],
+      "84101": [40.7608, -111.8910],
+    };
+
+    const nodes = [
+      { node_id: "dc-east", node_type: "dc", zip_code: "10001", lat: 40.7506, lon: -73.9972, cost_to_ship_factor: 1.0 },
+      { node_id: "dc-south", node_type: "dc", zip_code: "30301", lat: 33.7525, lon: -84.3915, cost_to_ship_factor: 1.1 },
+      { node_id: "store-chi", node_type: "store", zip_code: "60601", lat: 41.8864, lon: -87.6186, cost_to_ship_factor: 0.9 },
+      { node_id: "store-dal", node_type: "store", zip_code: "75201", lat: 32.7876, lon: -96.7994, cost_to_ship_factor: 0.95 },
+      { node_id: "dc-west", node_type: "dc", zip_code: "90001", lat: 33.9739, lon: -118.2487, cost_to_ship_factor: 1.2 },
+    ];
+
+    const inventory = [
+      { sku: "HAMMER-001", node_id: "dc-east", on_hand: 20, reserved: 0, safety_stock: 0 },
+      { sku: "HAMMER-001", node_id: "store-chi", on_hand: 4, reserved: 0, safety_stock: 0 },
+      { sku: "HAMMER-001", node_id: "store-dal", on_hand: 2, reserved: 0, safety_stock: 0 },
+      { sku: "PAINT-RED-1G", node_id: "dc-south", on_hand: 10, reserved: 0, safety_stock: 0 },
+      { sku: "PAINT-RED-1G", node_id: "dc-west", on_hand: 7, reserved: 0, safety_stock: 0 },
+    ];
+
+    const els = {
+      orderNo: document.getElementById("orderNo"),
+      buyerUserId: document.getElementById("buyerUserId"),
+      shipToZipCode: document.getElementById("shipToZipCode"),
+      itemId: document.getElementById("itemId"),
+      orderedQty: document.getElementById("orderedQty"),
+      unitPrice: document.getElementById("unitPrice"),
+      runButton: document.getElementById("runButton"),
+      resetButton: document.getElementById("resetButton"),
+      policyVersionHero: document.getElementById("policyVersionHero"),
+      policyRadiusSidebar: document.getElementById("policyRadiusSidebar"),
+      map: document.getElementById("map"),
+      statusBanner: document.getElementById("statusBanner"),
+      selectedNodeMetric: document.getElementById("selectedNodeMetric"),
+      distanceMetric: document.getElementById("distanceMetric"),
+      scoreMetric: document.getElementById("scoreMetric"),
+      promiseMetric: document.getElementById("promiseMetric"),
+      explanationBox: document.getElementById("explanationBox"),
+      candidateList: document.getElementById("candidateList"),
+      timeline: document.getElementById("timeline"),
+      scoreTableBody: document.getElementById("scoreTableBody"),
+    };
+
+    els.policyVersionHero.textContent = policy.version;
+    els.policyRadiusSidebar.textContent = policy.radius_miles;
+
+    function haversineMiles(originZip, destZip) {
+      const origin = zipCoords[originZip];
+      const dest = zipCoords[destZip];
+      if (!origin || !dest) return 9999;
+      const [lat1, lon1] = origin.map(v => v * Math.PI / 180);
+      const [lat2, lon2] = dest.map(v => v * Math.PI / 180);
+      const dLat = lat2 - lat1;
+      const dLon = lon2 - lon1;
+      const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return 3958.8 * c;
+    }
+
+    function formatDate(offsetDays) {
+      const now = new Date();
+      const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offsetDays);
+      return next.toISOString().slice(0, 10);
+    }
+
+    function computePromise(originZip, destinationZip) {
+      let transitDays;
+      if (originZip === destinationZip) {
+        transitDays = 1;
+      } else {
+        const origin = zipCoords[originZip];
+        const dest = zipCoords[destinationZip];
+        if (!origin || !dest) {
+          transitDays = 5;
+        } else {
+          transitDays = Math.abs(origin[0] - dest[0]) < 5 ? 2 : 4;
+        }
+      }
+      return {
+        p50_date: formatDate(transitDays),
+        p80_date: formatDate(transitDays + 1),
+        p95_date: formatDate(transitDays + 2),
+        confidence: 0.8,
+      };
+    }
+
+    function getAvailable(record) {
+      return Math.max(record.on_hand - record.reserved - record.safety_stock, 0);
+    }
+
+    function buildCandidates(sku, zip, qty) {
+      return inventory
+        .filter(record => record.sku === sku)
+        .map(record => {
+          const node = nodes.find(n => n.node_id === record.node_id);
+          const distance = haversineMiles(node.zip_code, zip);
+          return {
+            ...record,
+            node,
+            available: getAvailable(record),
+            distance_miles: Math.round(distance * 10) / 10,
+            feasible: getAvailable(record) >= qty && distance <= policy.radius_miles,
+          };
+        })
+        .filter(candidate => candidate.distance_miles <= policy.radius_miles)
+        .sort((a, b) => a.distance_miles - b.distance_miles);
+    }
+
+    function scoreCandidate(candidate) {
+      return Math.round(((candidate.distance_miles * policy.weights.shipping_cost) + ((10 / Math.max(candidate.available, 1)) * policy.weights.capacity_pressure)) * 100) / 100;
+    }
+
+    function pickBest(candidates, qty) {
+      const feasible = candidates
+        .filter(candidate => candidate.available >= qty)
+        .map(candidate => ({ ...candidate, total_score: scoreCandidate(candidate) }));
+      if (!feasible.length) return null;
+      feasible.sort((a, b) => a.total_score - b.total_score);
+      return feasible[0];
+    }
+
+    function pointFor(lat, lon) {
+      const minLon = -125, maxLon = -66, minLat = 24, maxLat = 50;
+      const x = ((lon - minLon) / (maxLon - minLon)) * 100;
+      const y = 100 - ((lat - minLat) / (maxLat - minLat)) * 100;
+      return { x, y };
+    }
+
+    function renderMap(destinationZip, selectedNodeId) {
+      const destination = zipCoords[destinationZip];
+      const destinationPoint = destination ? pointFor(destination[0], destination[1]) : null;
+      const selectedNode = nodes.find(node => node.node_id === selectedNodeId);
+      const lines = selectedNode && destination ? (() => {
+        const from = pointFor(selectedNode.lat, selectedNode.lon);
+        const to = destinationPoint;
+        return `<line x1="${from.x}%" y1="${from.y}%" x2="${to.x}%" y2="${to.y}%" stroke="rgba(34,197,94,0.8)" stroke-width="2.5" stroke-dasharray="8 7" />`;
+      })() : "";
+
+      const nodeMarkup = nodes.map(node => {
+        const point = pointFor(node.lat, node.lon);
+        const selected = node.node_id === selectedNodeId;
+        return `
+          <g>
+            <circle cx="${point.x}%" cy="${point.y}%" r="${selected ? 8 : 6}" fill="${selected ? '#22c55e' : '#60a5fa'}" stroke="rgba(255,255,255,0.7)" stroke-width="1.5"></circle>
+            <text x="${point.x}%" y="calc(${point.y}% - 14px)" text-anchor="middle" fill="#e2e8f0" font-size="11" font-weight="700">${node.node_id}</text>
+          </g>
+        `;
+      }).join("");
+
+      const destinationMarkup = destinationPoint ? `
+        <g>
+          <circle cx="${destinationPoint.x}%" cy="${destinationPoint.y}%" r="8" fill="#f59e0b" stroke="rgba(255,255,255,0.7)" stroke-width="1.5"></circle>
+          <text x="${destinationPoint.x}%" y="calc(${destinationPoint.y}% - 16px)" text-anchor="middle" fill="#fde68a" font-size="11" font-weight="700">ZIP ${destinationZip}</text>
+        </g>
+      ` : `
+        <text x="50%" y="50%" text-anchor="middle" fill="rgba(226,232,240,0.5)" font-size="14">Unknown ZIP: ${destinationZip}</text>
+      `;
+
+      els.map.innerHTML = `
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+          <defs>
+            <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+              <path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(148,163,184,0.08)" stroke-width="0.4"/>
+            </pattern>
+          </defs>
+          <rect width="100" height="100" fill="url(#grid)"></rect>
+          <path d="M8,52 C12,38 23,25 34,24 C42,17 56,18 63,26 C71,26 81,33 90,39 C94,45 92,53 85,57 C77,59 74,68 67,72 C57,73 48,78 40,75 C33,76 28,73 22,67 C14,66 8,61 8,52 Z" fill="rgba(15,23,42,0.35)" stroke="rgba(148,163,184,0.18)" stroke-width="0.6"/>
+          ${lines}
+          ${nodeMarkup}
+          ${destinationMarkup}
+        </svg>
+      `;
+    }
+
+    function renderCandidates(candidates, selectedNodeId) {
+      if (!candidates.length) {
+        els.candidateList.innerHTML = `<div class="candidate"><div class="candidate-name">No candidates inside policy radius</div><div class="candidate-meta">Try Chicago, Dallas, or Miami to see a successful flow with the current 150-mile radius.</div></div>`;
+        return;
+      }
+
+      els.candidateList.innerHTML = candidates.map(candidate => `
+        <div class="candidate ${candidate.node.node_id === selectedNodeId ? 'selected' : ''}">
+          <div class="candidate-top">
+            <div>
+              <div class="candidate-name">${candidate.node.node_id}</div>
+              <div class="candidate-meta">${candidate.node.node_type.toUpperCase()} · ZIP ${candidate.node.zip_code}</div>
+            </div>
+            <span class="chip ${candidate.node.node_id === selectedNodeId ? 'good' : 'info'}">${candidate.node.node_id === selectedNodeId ? 'Selected' : 'Candidate'}</span>
+          </div>
+          <div class="candidate-stats">
+            <div><strong>${candidate.available}</strong><br /><span class="candidate-meta">available</span></div>
+            <div><strong>${candidate.distance_miles}</strong><br /><span class="candidate-meta">miles</span></div>
+            <div><strong>${candidate.feasible ? 'yes' : 'no'}</strong><br /><span class="candidate-meta">feasible</span></div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderScoreTable(candidates, qty, selectedNodeId) {
+      els.scoreTableBody.innerHTML = candidates.map(candidate => {
+        const feasible = candidate.available >= qty;
+        const score = feasible ? scoreCandidate(candidate).toFixed(2) : '—';
+        return `
+          <tr>
+            <td>${candidate.node.node_id}${candidate.node.node_id === selectedNodeId ? ' ✅' : ''}</td>
+            <td>${candidate.node.node_type}</td>
+            <td>${candidate.node.zip_code}</td>
+            <td>${candidate.available}</td>
+            <td>${candidate.distance_miles}</td>
+            <td>${feasible ? 'yes' : 'no'}</td>
+            <td>${score}</td>
+          </tr>
+        `;
+      }).join("") || `<tr><td colspan="7">No candidates found.</td></tr>`;
+    }
+
+    function renderTimeline(data) {
+      els.timeline.innerHTML = data.map((item, index) => `
+        <div class="timeline-item">
+          <div class="timeline-dot">${index + 1}</div>
+          <div class="timeline-copy">
+            <strong>${item.title}</strong>
+            <span>${item.detail}</span>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function runDemo() {
+      const order = {
+        OrderNo: els.orderNo.value.trim() || 'Y10000001',
+        BuyerUserId: els.buyerUserId.value.trim() || 'cust-001',
+        ShipToZipCode: els.shipToZipCode.value.trim(),
+        OrderLines: [{
+          ItemID: els.itemId.value,
+          OrderedQty: Number(els.orderedQty.value || 1),
+          UnitPrice: Number(els.unitPrice.value || 0),
+        }],
+      };
+
+      const qty = order.OrderLines[0].OrderedQty;
+      const sku = order.OrderLines[0].ItemID;
+      const candidates = buildCandidates(sku, order.ShipToZipCode, qty);
+      const best = pickBest(candidates, qty);
+
+      renderMap(order.ShipToZipCode, best?.node.node_id);
+      renderCandidates(candidates, best?.node.node_id);
+      renderScoreTable(candidates, qty, best?.node.node_id);
+
+      if (!best) {
+        els.selectedNodeMetric.textContent = 'No match';
+        els.distanceMetric.textContent = '—';
+        els.scoreMetric.textContent = '—';
+        els.promiseMetric.textContent = '—';
+        els.explanationBox.textContent = `OpenOMS rejected this request because no ${sku} candidates were both inside the ${policy.radius_miles}-mile policy radius and able to satisfy quantity ${qty}.`;
+        els.statusBanner.innerHTML = `
+          <strong>Result:</strong> no deterministic fulfillment candidate.<br />
+          The engine returned a real failure instead of making up inventory or ignoring the policy radius.
+        `;
+        renderTimeline([
+          { title: 'Order received', detail: `Validated ${order.OrderNo} for SKU ${sku} shipping to ZIP ${order.ShipToZipCode}.` },
+          { title: 'Candidate search', detail: `Found ${candidates.length} in-radius candidates for ${sku}.` },
+          { title: 'Feasibility check', detail: `None could satisfy quantity ${qty} under the current radius/policy constraints.` },
+          { title: 'Decision', detail: 'No sourcing commitment created.' },
+        ]);
+        return;
+      }
+
+      const promise = computePromise(best.node.zip_code, order.ShipToZipCode);
+      const totalCost = Math.round(best.distance_miles * best.node.cost_to_ship_factor * 100) / 100;
+      els.selectedNodeMetric.textContent = best.node.node_id;
+      els.distanceMetric.textContent = `${best.distance_miles} mi`;
+      els.scoreMetric.textContent = best.total_score.toFixed(2);
+      els.promiseMetric.textContent = promise.p50_date;
+      els.explanationBox.textContent = `OpenOMS sourced SKU ${sku} from ${best.node.node_id} because it had enough inventory and the best tradeoff between proximity and availability for destination ${order.ShipToZipCode}.`;
+      els.statusBanner.innerHTML = `
+        <strong>Result:</strong> sourced from <strong>${best.node.node_id}</strong> with deterministic score <strong>${best.total_score.toFixed(2)}</strong>.<br />
+        Estimated promise window: ${promise.p50_date} / ${promise.p80_date} / ${promise.p95_date}. Estimated shipping cost proxy: ${totalCost.toFixed(2)}.
+      `;
+      renderTimeline([
+        { title: 'Order received', detail: `Validated ${order.OrderNo} for buyer ${order.BuyerUserId}.` },
+        { title: 'Candidates evaluated', detail: `Found ${candidates.length} in-radius inventory candidates for ${sku}.` },
+        { title: 'Scorer completed', detail: `Selected ${best.node.node_id} using distance × shipping_cost plus (10 / available) × capacity_pressure.` },
+        { title: 'Promise calculated', detail: `Promise window computed deterministically from ${best.node.zip_code} → ${order.ShipToZipCode}.` },
+        { title: 'Decision committed', detail: `Shipment assigned to ${best.node.node_id}; explanation derived from structured trace.` },
+      ]);
+    }
+
+    function resetDemo() {
+      els.orderNo.value = 'Y10000001';
+      els.buyerUserId.value = 'cust-001';
+      els.shipToZipCode.value = '60601';
+      els.itemId.value = 'HAMMER-001';
+      els.orderedQty.value = 1;
+      els.unitPrice.value = 19.99;
+      runDemo();
+    }
+
+    document.querySelectorAll('.preset').forEach(button => {
+      button.addEventListener('click', () => {
+        els.shipToZipCode.value = button.dataset.zip;
+        els.itemId.value = button.dataset.sku;
+        els.orderedQty.value = button.dataset.qty;
+        els.unitPrice.value = button.dataset.price;
+        runDemo();
+      });
+    });
+
+    els.runButton.addEventListener('click', runDemo);
+    els.resetButton.addEventListener('click', resetDemo);
+    runDemo();
+  </script>
+</body>
+</html>

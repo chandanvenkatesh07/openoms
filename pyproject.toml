@@ -33,6 +33,7 @@ redis = [
 
 [project.scripts]
 openoms-server = "openoms.server:main"
+openoms-api = "openoms.api_server:main"
 openoms-demo = "openoms.demo:main"
 
 [tool.setuptools]
