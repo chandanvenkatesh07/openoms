@@ -74,6 +74,12 @@ PYTHONPATH=. pytest
 PYTHONPATH=. python -m openoms.demo
 ```
 
+For future persistence work, install the infrastructure extras only when you need them:
+
+```bash
+pip install -e ".[postgres,redis]"
+```
+
 ## Current local validation note
 
 I validated the service layer and tests locally under the host Python available in this workspace.
