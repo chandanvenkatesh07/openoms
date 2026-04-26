@@ -5,7 +5,7 @@
 1. Replace the in-memory store with Postgres-backed repositories.
 2. Add Redis-backed idempotency and hot inventory caching.
 3. Persist decision events to the database rather than memory only.
-4. Introduce OR-Tools for richer scoring once multi-candidate constraints matter.
+4. Introduce richer multi-constraint optimization once multi-candidate constraints matter.
 5. Add real MCP client setup instructions after local validation.
 
 ## Intentional decisions I made

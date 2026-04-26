@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from openoms.kernel.promise import compute_promise
-from openoms.kernel.solver import choose_best_node
+from openoms.kernel.scorer import choose_best_node
 from openoms.models.domain import (
     ExplainDecisionRequest,
     InventoryQuery,
@@ -14,13 +14,15 @@ from openoms.models.domain import (
     SourcingDecision,
 )
 from openoms.models.events import DecisionEvent
+from openoms.policy import load_policy
 from openoms.store.memory import MemoryStore, build_seed_store
 
 
 class OpenOMSService:
-    def __init__(self, store: MemoryStore | None = None, policy_version: str = "2026-04-25") -> None:
+    def __init__(self, store: MemoryStore | None = None, policy_path: str | None = None) -> None:
         self.store = store or build_seed_store()
-        self.policy_version = policy_version
+        self.policy = load_policy(policy_path)
+        self.policy_version = str(self.policy.get("version", "2026-04-25"))
 
     def get_inventory(self, request: InventoryQuery) -> list[InventoryView]:
         return self.store.get_inventory(request.sku, request.near_zip, request.radius_miles)
@@ -30,9 +32,10 @@ class OpenOMSService:
             raise ValueError("v0.1 only supports single-line orders")
         self.store.append_event(DecisionEvent(decision_id=order.order_id, event_type="order_received", payload=order.model_dump()))
         line = order.lines[0]
-        candidates = self.get_inventory(InventoryQuery(sku=line.sku, near_zip=order.shipping_zip, radius_miles=5000))
+        radius_miles = int(self.policy.get("radius_miles", 5000))
+        candidates = self.get_inventory(InventoryQuery(sku=line.sku, near_zip=order.shipping_zip, radius_miles=radius_miles))
         self.store.append_event(DecisionEvent(decision_id=order.order_id, event_type="candidates_evaluated", payload={"candidates": [candidate.model_dump() for candidate in candidates]}))
-        best = choose_best_node(order, candidates)
+        best = choose_best_node(order, candidates, weights=self.policy.get("weights"))
         node = self.store.nodes[best.node_id]
         promise = compute_promise(node.zip_code, order.shipping_zip)
         reservation = self.store.reserve(

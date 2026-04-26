@@ -50,6 +50,8 @@ Begin with a small YAML config containing:
 - node filtering toggles
 - a few hard constraints
 
+For v0.1 that config now lives in `policies/default.yaml` and is loaded directly by the service.
+
 Only promote it into a richer DSL after 2–3 real policies exist.
 
 ### 3. Treat promise dates as deterministic first
