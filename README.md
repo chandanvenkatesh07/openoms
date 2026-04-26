@@ -21,11 +21,37 @@ The current implementation is intentionally narrow. It proves the architecture b
 - Python package scaffold
 - FastMCP server entrypoint
 - Pydantic domain models
+- Sterling-style order input schema
 - in-memory repositories for local development and tests
 - small seeded synthetic dataset
 - `get_inventory`, `source_order`, and `explain_decision`
 - basic demo script and tests
 - Docker skeleton for the future Postgres/Redis-backed runtime
+
+## Order schema shape
+
+The inbound order payload now uses IBM Sterling-inspired field names so examples look closer to a real OMS integration surface.
+
+```json
+{
+  "OrderNo": "Y10000001",
+  "EnterpriseCode": "DEFAULT",
+  "SellerOrganizationCode": "DEFAULT",
+  "DocumentType": "0001",
+  "BuyerUserId": "cust-1",
+  "ShipToZipCode": "60601",
+  "EntryType": "WEB",
+  "OrderLines": [
+    {
+      "PrimeLineNo": "1",
+      "ItemID": "HAMMER-001",
+      "OrderedQty": 1,
+      "UnitPrice": 19.99,
+      "FulfillmentType": "ship"
+    }
+  ]
+}
+```
 
 ## What is intentionally deferred
 

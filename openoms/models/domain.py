@@ -7,7 +7,11 @@ from enum import Enum
 from typing import List, Optional
 from uuid import uuid4
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class SterlingModel(BaseModel):
+    model_config = ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
 
 class CustomerType(str, Enum):
@@ -27,26 +31,40 @@ class LineType(str, Enum):
     DELIVERY = "delivery"
 
 
-class OrderLine(BaseModel):
-    line_id: str = Field(default_factory=lambda: str(uuid4()))
-    sku: str
-    quantity: int = Field(gt=0)
-    unit_price: float = Field(ge=0)
-    line_type: LineType = LineType.SHIP
+class OrderLine(SterlingModel):
+    order_line_key: str = Field(default_factory=lambda: str(uuid4()), alias="OrderLineKey")
+    prime_line_no: str = Field(default="1", alias="PrimeLineNo")
+    sku: str = Field(alias="ItemID")
+    quantity: int = Field(gt=0, alias="OrderedQty")
+    unit_price: float = Field(ge=0, alias="UnitPrice")
+    line_type: LineType = Field(default=LineType.SHIP, alias="FulfillmentType")
+    ship_node: Optional[str] = Field(default=None, alias="ShipNode")
+
+    @property
+    def line_id(self) -> str:
+        return self.order_line_key
 
 
-class Order(BaseModel):
-    order_id: str = Field(default_factory=lambda: str(uuid4()))
-    customer_id: str
-    customer_type: CustomerType = CustomerType.CONSUMER
-    shipping_zip: str = Field(min_length=5, max_length=10)
-    channel: str = "web"
-    lines: List[OrderLine] = Field(min_length=1)
-    requested_delivery_date: Optional[str] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+class Order(SterlingModel):
+    order_header_key: str = Field(default_factory=lambda: str(uuid4()), alias="OrderHeaderKey")
+    order_no: str = Field(default_factory=lambda: f"WEB-{str(uuid4())[:8].upper()}", alias="OrderNo")
+    enterprise_code: str = Field(default="DEFAULT", alias="EnterpriseCode")
+    seller_organization_code: str = Field(default="DEFAULT", alias="SellerOrganizationCode")
+    document_type: str = Field(default="0001", alias="DocumentType")
+    customer_id: str = Field(alias="BuyerUserId")
+    customer_type: CustomerType = Field(default=CustomerType.CONSUMER, alias="CustomerType")
+    shipping_zip: str = Field(min_length=5, max_length=10, alias="ShipToZipCode")
+    channel: str = Field(default="WEB", alias="EntryType")
+    lines: List[OrderLine] = Field(min_length=1, alias="OrderLines")
+    requested_delivery_date: Optional[str] = Field(default=None, alias="ReqDeliveryDate")
+    created_at: datetime = Field(default_factory=datetime.utcnow, alias="OrderDate")
+
+    @property
+    def order_id(self) -> str:
+        return self.order_header_key
 
 
-class Node(BaseModel):
+class Node(SterlingModel):
     node_id: str
     node_type: NodeType
     zip_code: str
@@ -57,7 +75,7 @@ class Node(BaseModel):
     supports_ship: bool = True
 
 
-class InventoryRecord(BaseModel):
+class InventoryRecord(SterlingModel):
     sku: str
     node_id: str
     on_hand: int = Field(ge=0)
@@ -69,7 +87,7 @@ class InventoryRecord(BaseModel):
         return max(self.on_hand - self.reserved - self.safety_stock, 0)
 
 
-class Reservation(BaseModel):
+class Reservation(SterlingModel):
     reservation_id: str = Field(default_factory=lambda: str(uuid4()))
     order_id: str
     line_id: str
@@ -81,7 +99,7 @@ class Reservation(BaseModel):
     idempotency_key: str
 
 
-class PromiseWindow(BaseModel):
+class PromiseWindow(SterlingModel):
     p50_date: str
     p80_date: str
     p95_date: str
@@ -89,7 +107,7 @@ class PromiseWindow(BaseModel):
     method: str = "deterministic"
 
 
-class Shipment(BaseModel):
+class Shipment(SterlingModel):
     node_id: str
     node_type: NodeType
     line_ids: List[str]
@@ -97,7 +115,7 @@ class Shipment(BaseModel):
     promise: PromiseWindow
 
 
-class SourcingDecision(BaseModel):
+class SourcingDecision(SterlingModel):
     decision_id: str = Field(default_factory=lambda: str(uuid4()))
     order_id: str
     shipments: List[Shipment]
@@ -110,13 +128,13 @@ class SourcingDecision(BaseModel):
     status: str = "committed"
 
 
-class InventoryQuery(BaseModel):
+class InventoryQuery(SterlingModel):
     sku: str
     near_zip: Optional[str] = None
     radius_miles: int = Field(default=50, gt=0)
 
 
-class InventoryView(BaseModel):
+class InventoryView(SterlingModel):
     node_id: str
     node_type: NodeType
     on_hand: int
@@ -124,7 +142,7 @@ class InventoryView(BaseModel):
     distance_miles: float
 
 
-class ReserveRequest(BaseModel):
+class ReserveRequest(SterlingModel):
     sku: str
     node_id: str
     quantity: int = Field(gt=0)
@@ -134,6 +152,6 @@ class ReserveRequest(BaseModel):
     line_id: Optional[str] = None
 
 
-class ExplainDecisionRequest(BaseModel):
+class ExplainDecisionRequest(SterlingModel):
     decision_id: str
     audience: str = "customer"

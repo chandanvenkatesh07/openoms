@@ -23,7 +23,7 @@ if FastMCP is not None:
     @mcp.tool()
     def source_order(order: dict, idempotency_key: str) -> dict:
         parsed = Order.model_validate(order)
-        return service.source_order(parsed, idempotency_key).model_dump(mode="json")
+        return service.source_order(parsed, idempotency_key).model_dump(mode="json", by_alias=True)
 
     @mcp.tool()
     def explain_decision(decision_id: str, audience: str = "customer") -> dict:
