@@ -1,6 +1,6 @@
 # OpenOMS
 
-Every commercial OMS vendor — IBM Sterling, Manhattan, Blue Yonder — hides the sourcing brain behind SaaS walls and product sprawl. The part that actually decides where to ship from, when it will arrive, and how to handle exceptions is usually the least inspectable part of the stack. OpenOMS is an open-source reference implementation of that **decisioning brain**.
+Every commercial OMS vendor — Manhattan, Blue Yonder, and the rest of the OMS market — hides the sourcing brain behind SaaS walls and product sprawl. The part that actually decides where to ship from, when it will arrive, and how to handle exceptions is usually the least inspectable part of the stack. OpenOMS is an open-source reference implementation of that **decisioning brain**.
 
 It is intentionally being built as a narrow, credible reference first — not as a fake-complete enterprise platform.
 
@@ -21,7 +21,7 @@ The current implementation is intentionally narrow. It proves the architecture b
 - Python package scaffold
 - FastMCP server entrypoint
 - Pydantic domain models
-- Sterling-style order input schema
+- enterprise-style order input schema
 - in-memory repositories for local development and tests
 - policy-backed deterministic scoring weights loaded from `policies/default.yaml`
 - small 5-node seeded synthetic dataset
@@ -31,11 +31,11 @@ The current implementation is intentionally narrow. It proves the architecture b
 
 ## Order schema shape
 
-The inbound order payload now uses IBM Sterling-inspired field names so examples look closer to a real OMS integration surface.
+The inbound order payload uses enterprise OMS-style field names so examples look closer to a real integration surface.
 
 ```json
 {
-  "OrderNo": "Y10000001",
+  "OrderNo": "O10000001",
   "EnterpriseCode": "DEFAULT",
   "SellerOrganizationCode": "DEFAULT",
   "DocumentType": "0001",

@@ -466,7 +466,7 @@
         <div class="badge-row">
           <div class="badge">OpenOMS v0.1 playground</div>
           <div class="badge">Deterministic sourcing</div>
-          <div class="badge">Sterling-style order input</div>
+          <div class="badge">Enterprise-style order input</div>
         </div>
         <h1>Watch the sourcing decision happen.</h1>
         <p class="lead">
@@ -506,12 +506,12 @@
         <div class="panel card">
           <div class="section-title">
             <h2>Order input</h2>
-            <span>Sterling-style fields</span>
+            <span>Enterprise-style fields</span>
           </div>
           <div class="form-grid">
             <div class="field">
               <label for="orderNo">OrderNo</label>
-              <input id="orderNo" value="Y10000001" />
+              <input id="orderNo" value="O10000001" />
             </div>
             <div class="field">
               <label for="buyerUserId">BuyerUserId</label>
@@ -926,7 +926,7 @@
 
     function runDemo() {
       const order = {
-        OrderNo: els.orderNo.value.trim() || 'Y10000001',
+        OrderNo: els.orderNo.value.trim() || 'O10000001',
         BuyerUserId: els.buyerUserId.value.trim() || 'cust-001',
         ShipToZipCode: els.shipToZipCode.value.trim(),
         OrderLines: [{
@@ -985,7 +985,7 @@
     }
 
     function resetDemo() {
-      els.orderNo.value = 'Y10000001';
+      els.orderNo.value = 'O10000001';
       els.buyerUserId.value = 'cust-001';
       els.shipToZipCode.value = '60601';
       els.itemId.value = 'HAMMER-001';

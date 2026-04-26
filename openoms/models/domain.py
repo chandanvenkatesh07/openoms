@@ -10,7 +10,7 @@ from uuid import uuid4
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class SterlingModel(BaseModel):
+class AliasModel(BaseModel):
     model_config = ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
 
@@ -31,7 +31,7 @@ class LineType(str, Enum):
     DELIVERY = "delivery"
 
 
-class OrderLine(SterlingModel):
+class OrderLine(AliasModel):
     order_line_key: str = Field(default_factory=lambda: str(uuid4()), alias="OrderLineKey")
     prime_line_no: str = Field(default="1", alias="PrimeLineNo")
     sku: str = Field(alias="ItemID")
@@ -45,9 +45,9 @@ class OrderLine(SterlingModel):
         return self.order_line_key
 
 
-class Order(SterlingModel):
+class Order(AliasModel):
     order_header_key: str = Field(default_factory=lambda: str(uuid4()), alias="OrderHeaderKey")
-    order_no: str = Field(default_factory=lambda: f"WEB-{str(uuid4())[:8].upper()}", alias="OrderNo")
+    order_no: str = Field(default_factory=lambda: f"O{str(uuid4().int)[:8]}", alias="OrderNo")
     enterprise_code: str = Field(default="DEFAULT", alias="EnterpriseCode")
     seller_organization_code: str = Field(default="DEFAULT", alias="SellerOrganizationCode")
     document_type: str = Field(default="0001", alias="DocumentType")
@@ -64,7 +64,7 @@ class Order(SterlingModel):
         return self.order_header_key
 
 
-class Node(SterlingModel):
+class Node(AliasModel):
     node_id: str
     node_type: NodeType
     zip_code: str
@@ -75,7 +75,7 @@ class Node(SterlingModel):
     supports_ship: bool = True
 
 
-class InventoryRecord(SterlingModel):
+class InventoryRecord(AliasModel):
     sku: str
     node_id: str
     on_hand: int = Field(ge=0)
@@ -87,7 +87,7 @@ class InventoryRecord(SterlingModel):
         return max(self.on_hand - self.reserved - self.safety_stock, 0)
 
 
-class Reservation(SterlingModel):
+class Reservation(AliasModel):
     reservation_id: str = Field(default_factory=lambda: str(uuid4()))
     order_id: str
     line_id: str
@@ -99,7 +99,7 @@ class Reservation(SterlingModel):
     idempotency_key: str
 
 
-class PromiseWindow(SterlingModel):
+class PromiseWindow(AliasModel):
     p50_date: str
     p80_date: str
     p95_date: str
@@ -107,7 +107,7 @@ class PromiseWindow(SterlingModel):
     method: str = "deterministic"
 
 
-class Shipment(SterlingModel):
+class Shipment(AliasModel):
     node_id: str
     node_type: NodeType
     line_ids: List[str]
@@ -115,7 +115,7 @@ class Shipment(SterlingModel):
     promise: PromiseWindow
 
 
-class SourcingDecision(SterlingModel):
+class SourcingDecision(AliasModel):
     decision_id: str = Field(default_factory=lambda: str(uuid4()))
     order_id: str
     shipments: List[Shipment]
@@ -128,13 +128,13 @@ class SourcingDecision(SterlingModel):
     status: str = "committed"
 
 
-class InventoryQuery(SterlingModel):
+class InventoryQuery(AliasModel):
     sku: str
     near_zip: Optional[str] = None
     radius_miles: int = Field(default=50, gt=0)
 
 
-class InventoryView(SterlingModel):
+class InventoryView(AliasModel):
     node_id: str
     node_type: NodeType
     on_hand: int
@@ -142,7 +142,7 @@ class InventoryView(SterlingModel):
     distance_miles: float
 
 
-class ReserveRequest(SterlingModel):
+class ReserveRequest(AliasModel):
     sku: str
     node_id: str
     quantity: int = Field(gt=0)
@@ -152,6 +152,6 @@ class ReserveRequest(SterlingModel):
     line_id: Optional[str] = None
 
 
-class ExplainDecisionRequest(SterlingModel):
+class ExplainDecisionRequest(AliasModel):
     decision_id: str
     audience: str = "customer"

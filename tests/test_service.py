@@ -3,13 +3,13 @@ from openoms.models.domain import ExplainDecisionRequest, InventoryQuery, Order,
 
 def test_order_schema_serializes_with_sterling_field_names() -> None:
     order = Order(
-        OrderNo="Y10000000",
+        OrderNo="O10000000",
         BuyerUserId="cust-sterling",
         ShipToZipCode="60601",
         OrderLines=[OrderLine(ItemID="HAMMER-001", OrderedQty=2, UnitPrice=19.99)],
     )
     payload = order.model_dump(mode="json", by_alias=True)
-    assert payload["OrderNo"] == "Y10000000"
+    assert payload["OrderNo"] == "O10000000"
     assert payload["BuyerUserId"] == "cust-sterling"
     assert payload["OrderLines"][0]["ItemID"] == "HAMMER-001"
 
@@ -26,7 +26,7 @@ def test_get_inventory_returns_sorted_candidates() -> None:
 def test_source_order_creates_single_shipment_and_decision() -> None:
     service = OpenOMSService()
     order = Order(
-        OrderNo="Y10000001",
+        OrderNo="O10000001",
         BuyerUserId="cust-1",
         ShipToZipCode="60601",
         OrderLines=[OrderLine(ItemID="HAMMER-001", OrderedQty=1, UnitPrice=19.99)],
@@ -40,7 +40,7 @@ def test_source_order_creates_single_shipment_and_decision() -> None:
 def test_explain_decision_returns_trace() -> None:
     service = OpenOMSService()
     order = Order(
-        OrderNo="Y10000002",
+        OrderNo="O10000002",
         BuyerUserId="cust-1",
         ShipToZipCode="60601",
         OrderLines=[OrderLine(ItemID="HAMMER-001", OrderedQty=1, UnitPrice=19.99)],
