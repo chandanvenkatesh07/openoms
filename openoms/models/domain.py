@@ -137,6 +137,7 @@ class InventoryQuery(AliasModel):
 class InventoryView(AliasModel):
     node_id: str
     node_type: NodeType
+    sku: str
     on_hand: int
     available: int
     distance_miles: float

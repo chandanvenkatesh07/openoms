@@ -1,8 +1,12 @@
 policy: openoms-default
 version: 2026-04-25
+description: Default Hearthline sourcing policy
+
 weights:
   shipping_cost: 1.0
   split_penalty: 5.0
-  late_promise_penalty: 10.0
   capacity_pressure: 1.5
-radius_miles: 150
+  late_promise_penalty: 10.0
+
+radius_miles: 5000
+solver_time_limit_ms: 200
