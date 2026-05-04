@@ -36,6 +36,7 @@ redis = [
 openoms-server = "openoms.server:main"
 openoms-api = "openoms.api_server:main"
 openoms-demo = "openoms.demo:main"
+openoms-bench = "openoms.benchmark:main"
 
 [tool.setuptools]
 packages = ["openoms", "openoms.kernel", "openoms.store", "openoms.models", "openoms.seed"]
