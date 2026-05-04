@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional
+from typing import Any, List, Optional, Union
 from uuid import uuid4
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -156,3 +156,58 @@ class ReserveRequest(AliasModel):
 class ExplainDecisionRequest(AliasModel):
     decision_id: str
     audience: str = "customer"
+
+
+# ---------------------------------------------------------------------------
+# Agentic feature models
+# ---------------------------------------------------------------------------
+
+class RelaxationAttempt(AliasModel):
+    """Records one step in a constraint-relaxation loop."""
+    step: int
+    param: str
+    value: Union[int, float]
+    outcome: str  # "INFEASIBLE" | "OPTIMAL" | "FEASIBLE"
+    detail: str = ""
+
+
+class RelaxationResult(AliasModel):
+    """Returned by relax_and_source — decision plus the relaxation history."""
+    decision: SourcingDecision
+    attempts: List[RelaxationAttempt]
+    original_constraints_met: bool
+    winning_radius_miles: Optional[int] = None
+    agent_summary: str
+
+
+class SourcingOption(AliasModel):
+    """One policy-profile option, returned by get_sourcing_options."""
+    option_id: str
+    label: str
+    description: str
+    decision: SourcingDecision
+    pros: List[str]
+    cons: List[str]
+
+
+class ResourcingChangeLine(AliasModel):
+    """Per-line delta between two sourcing decisions."""
+    line_id: str
+    sku: str
+    old_node_id: str
+    new_node_id: str
+    old_distance_miles: float
+    new_distance_miles: float
+    reason: str   # "inventory_depleted" | "reoptimized" | "node_unavailable"
+    explanation: str
+
+
+class ResourcingDiff(AliasModel):
+    """Structured diff between an original decision and a re-sourced decision."""
+    old_decision_id: str
+    new_decision_id: str
+    order_id: str
+    changed_lines: List[ResourcingChangeLine]
+    unchanged_line_ids: List[str]
+    split_count_delta: int   # new − old; negative = fewer splits after re-source
+    agent_summary: str

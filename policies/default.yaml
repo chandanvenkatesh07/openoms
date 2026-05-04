@@ -10,3 +10,8 @@ weights:
 
 radius_miles: 5000
 solver_time_limit_ms: 200
+
+# Relaxation cascade used by relax_and_source.
+# Steps tried in order; first feasible solution wins.
+relaxation_cascade:
+  radius_miles: [150, 500, 1500, 5000]
