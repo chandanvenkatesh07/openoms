@@ -5,12 +5,10 @@ the sequential greedy baseline:
 
   S1  — 50 distinct SKUs, qty=1  (baseline, low contention)
   S2  — 50 distinct SKUs, qty=1, split_penalty=500  (consolidation pressure)
-  S3  — 10 lines of same SKU at constrained stock  (pre-commitment error)
+  S3  — 4 lines across two SKUs at constrained stock  (pre-commitment error)
 
 Usage:
   python -m openoms.benchmark
-  # or:
-  openoms-demo  # (if you add an entry point in pyproject.toml)
 """
 
 from __future__ import annotations
